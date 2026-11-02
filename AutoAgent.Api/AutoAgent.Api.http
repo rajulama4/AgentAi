@@ -1,0 +1,57 @@
+### Lesson 2 — test every endpoint.
+### Works in Visual Studio 2022 (click "Send request") and in VS Code with the "REST Client" extension.
+
+@host = http://localhost:5080
+
+### 1. All car models
+GET {{host}}/api/cars/models
+
+### 2. One model
+GET {{host}}/api/cars/models/Volt-X
+
+### 3. Available new cars under $45,000 (your Lesson 1 homework, as an API)
+GET {{host}}/api/cars/inventory?condition=New&maxPrice=45000
+
+### 4. Family cars: 7+ seats
+GET {{host}}/api/cars/inventory?minSeats=7
+
+### 5. A sold car should return 404 (privacy!)
+GET {{host}}/api/cars/inventory/1LKSMT26A00000006
+
+### 6. Financing offers for the Volt-X (homework #2)
+GET {{host}}/api/financing?modelName=Volt-X
+
+### 7. Monthly payment: Ocean Blue Breeze, 60-month offer, minimum down
+GET {{host}}/api/financing/estimate?vin=1LKBRZ26A00000002&offerId=2
+
+### 8. Down payment too small -> 400 with a helpful message
+GET {{host}}/api/financing/estimate?vin=1LKBRZ26A00000002&offerId=2&downPayment=500
+
+### 9. Brake pads for the Summit (out of stock)
+GET {{host}}/api/parts?search=brake&modelName=Summit
+
+### 10. Policy topics, then one policy
+GET {{host}}/api/policies
+
+###
+GET {{host}}/api/policies/insurance
+
+### 11. Private data WITHOUT verifying -> 401
+GET {{host}}/api/customers/me/vehicles
+
+### 12. Wrong VIN digits -> 401
+POST {{host}}/api/customers/verify
+Content-Type: application/json
+
+{ "phone": "616-555-0101", "vinLast4": "9999" }
+
+### 13. Correct details -> token
+# @name verify
+POST {{host}}/api/customers/verify
+Content-Type: application/json
+
+{ "phone": "(616) 555-0101", "vinLast4": "0006" }
+
+### 14. Anita's own car, using the token from request 13
+GET {{host}}/api/customers/me/vehicles
+X-Customer-Token: {{verify.response.body.$.token}}
